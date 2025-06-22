@@ -2,14 +2,13 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>考试剩余时间</title>
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       background-color: #f4f6f8;
       text-align: center;
-      padding-top: 30px;
+      padding-top: 50px;
       margin: 0;
       position: relative;
       overflow: hidden;
@@ -49,21 +48,21 @@
     }
 
     h1 {
-      font-size: 2em;
+      font-size: 2.5em;
       color: #333;
       position: relative;
       z-index: 1;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
     /* 卡片容器布局 */
     .card-container {
       display: grid;
       grid-template-columns: repeat(3, 1fr); /* 每行3列 */
-      gap: 15px; /* 卡片之间的间距 */
+      gap: 20px; /* 卡片之间的间距 */
       max-width: 1200px; /* 容器最大宽度 */
       margin: 0 auto; /* 水平居中 */
-      padding: 0 15px; /* 响应式内边距 */
+      padding: 0 20px; /* 响应式内边距 */
       position: relative;
       z-index: 1;
     }
@@ -71,7 +70,7 @@
     .flip-container {
       perspective: 1000px;
       margin: 0; /* 移除原来的margin */
-      height: 200px;
+      height: 220px;
       position: relative;
       cursor: pointer;
       touch-action: manipulation;
@@ -99,9 +98,9 @@
       height: 100%;
       backface-visibility: hidden;
       background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.12);
-      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+      padding: 25px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -127,15 +126,14 @@
 
     .exam:hover,
     .exam-back:hover {
-      transform: scale(1.02);
+      transform: scale(1.03);
       opacity: 0.98;
       transition: transform 0.3s, opacity 0.3s, box-shadow 0.3s;
-      box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
     }
 
     .exam h2, .exam-back h2 {
       margin: 5px 0;
-      font-size: 1.1em;
       color: #2c3e50;
     }
 
@@ -145,109 +143,45 @@
     }
 
     .countdown {
-      font-size: 1.5em;
+      font-size: 1.8em;
       color: #e74c3c;
       font-weight: bold;
-      margin: 10px 0;
+      margin: 15px 0;
     }
 
     .review-content {
       color: white;
       text-align: center;
-      margin-top: 5px;
-      line-height: 1.5;
-      font-size: 0.9em;
+      margin-top: 10px;
+      line-height: 1.6;
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     }
 
     /* 响应式设计 - 小屏幕上每行显示1个卡片 */
-    @media (max-width: 500px) {
+    @media (max-width: 600px) {
       .card-container {
         grid-template-columns: 1fr;
-      }
-      
-      .flip-container {
-        height: 180px;
-      }
-      
-      h1 {
-        font-size: 1.8em;
-      }
-      
-      .countdown {
-        font-size: 1.3em;
       }
     }
 
     /* 中等屏幕上每行显示2个卡片 */
-    @media (min-width: 501px) and (max-width: 768px) {
+    @media (min-width: 601px) and (max-width: 900px) {
       .card-container {
         grid-template-columns: repeat(2, 1fr);
       }
-      
-      .flip-container {
-        height: 190px;
-      }
-    }
-    
-    /* 图片背景容器样式 */
-    .image-background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      overflow: hidden;
-    }
-    
-    .image-background img {
-      min-width: 100%;
-      min-height: 100%;
-      width: auto;
-      height: auto;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      object-fit: cover;
-    }
-    
-    .fallback-bg {
-      background-color: #f4f6f8;
-      width: 100%;
-      height: 100%;
-    }
-    
-    .image-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.3);
-    }
-    
-    .content {
-      position: relative;
-      z-index: 10;
-      padding: 20px;
-      color: white;
     }
   </style>
 </head>
 <body>
-  <!-- 图片背景容器 -->
-  <div class="image-background" style="background-image: url('原神.png'); background-size: cover; background-position: center; height: 100vh; width: 100%; position: relative;">
-    <!-- 图片加载失败时的备选背景 -->
-    <div class="fallback-bg" style="display: none; background-color: #f4f6f8; width: 100%; height: 100%;"></div>
-    <div class="image-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.3);"></div>
-    
-    <!-- 页面内容可以添加在这里 -->
-    <div class="content" style="position: relative; z-index: 10; padding: 20px; color: white;">
-      <h1>页面标题</h1>
-      <p>页面内容...</p>
-    </div>
+  <!-- 视频背景容器 -->
+  <div class="video-background">
+    <video autoplay muted loop playsinline>
+      <!-- 可以使用以下示例视频链接，或替换为您自己的视频 -->
+      <source src="原神.mp4" type="video/mp4">
+      <!-- 视频加载失败时的备选背景 -->
+      <div style="background-color: #f4f6f8; width: 100%; height: 100%;"></div>
+    </video>
+    <div class="video-overlay"></div>
   </div>
 
   <h1>考试剩余时间</h1>
@@ -392,19 +326,14 @@
     updateCountdowns();
     const countdownInterval = setInterval(updateCountdowns, 1000);
 
-    // 卡片翻转逻辑优化 - 增强手机触摸体验
+    // 卡片翻转逻辑优化
     document.querySelectorAll('.flip-container').forEach(container => {
       const flipper = container.querySelector('.flipper');
       let autoFlipTimer = null;
-      let touchStartX = 0;
-      let touchEndX = 0;
       
       // 点击正面卡片翻转到背面
-      container.addEventListener('click', (e) => {
+      container.addEventListener('click', () => {
         if (flipper.classList.contains('flipped') || autoFlipTimer) return;
-        
-        // 阻止点击事件冒泡
-        e.stopPropagation();
         
         // 翻转到背面
         flipper.classList.add('flipped');
@@ -415,36 +344,6 @@
           autoFlipTimer = null;
         }, 3000);
       });
-      
-      // 触摸开始事件
-      container.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-      }, false);
-      
-      // 触摸结束事件 - 支持滑动翻转
-      container.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-      }, false);
-      
-      // 处理滑动事件
-      function handleSwipe() {
-        if (flipper.classList.contains('flipped') || autoFlipTimer) return;
-        
-        // 计算滑动距离
-        const swipeDistance = touchStartX - touchEndX;
-        
-        // 向右滑动超过30像素视为翻转
-        if (swipeDistance > 30) {
-          flipper.classList.add('flipped');
-          
-          // 3秒后自动翻转回正面
-          autoFlipTimer = setTimeout(() => {
-            flipper.classList.remove('flipped');
-            autoFlipTimer = null;
-          }, 3000);
-        }
-      }
     });
 
     // 添加窗口卸载事件，清除定时器
@@ -457,27 +356,6 @@
           clearTimeout(flipper.autoFlipTimer);
         }
       });
-    });
-    
-    // 优化背景图片加载，确保在手机上正常显示
-    document.addEventListener('DOMContentLoaded', function() {
-      const imageBackground = document.querySelector('.image-background');
-      const fallbackBg = document.querySelector('.fallback-bg');
-      
-      // 创建图片对象检查加载状态
-      const img = new Image();
-      img.onload = function() {
-        imageBackground.style.display = 'block';
-        fallbackBg.style.display = 'none';
-      };
-      
-      img.onerror = function() {
-        imageBackground.style.display = 'none';
-        fallbackBg.style.display = 'block';
-      };
-      
-      // 设置图片源
-      img.src = '原神.png';
     });
   </script>
 </body>
