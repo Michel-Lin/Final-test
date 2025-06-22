@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>考试剩余时间</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+      text-align: center;
+      padding-top: 50px;
+      margin: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 视频背景样式 */
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+    
+    .video-background video {
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+    }
+    
+    .video-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.3); /* 半透明黑色遮罩 */
+      z-index: -1;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      color: #333;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 30px;
+    }
+
+    /* 卡片容器布局 */
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 每行3列 */
+      gap: 20px; /* 卡片之间的间距 */
+      max-width: 1200px; /* 容器最大宽度 */
+      margin: 0 auto; /* 水平居中 */
+      padding: 0 20px; /* 响应式内边距 */
+      position: relative;
+      z-index: 1;
+    }
+
+    .flip-container {
+      perspective: 1000px;
+      margin: 0; /* 移除原来的margin */
+      height: 220px;
+      position: relative;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.3s;
+    }
+
+    .flip-container:active {
+      transform: scale(0.98);
+    }
+
+    .flipper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .exam,
+    .exam-back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+      padding: 25px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      will-change: transform;
+    }
+
+    .exam {
+      z-index: 2;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    .exam-back {
+      transform: rotateY(180deg);
+      background: linear-gradient(135deg, #e66465 0%, #9198e5 100%);
+      pointer-events: none; /* 禁用背面的鼠标事件 */
+    }
+
+    .flipper.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .exam:hover,
+    .exam-back:hover {
+      transform: scale(1.03);
+      opacity: 0.98;
+      transition: transform 0.3s, opacity 0.3s, box-shadow 0.3s;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    .exam h2, .exam-back h2 {
+      margin: 5px 0;
+      color: #2c3e50;
+    }
+
+    .exam-back h2 {
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .countdown {
+      font-size: 1.8em;
+      color: #e74c3c;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+
+    .review-content {
+      color: white;
+      text-align: center;
+      margin-top: 10px;
+      line-height: 1.6;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 响应式设计 - 小屏幕上每行显示1个卡片 */
+    @media (max-width: 600px) {
+      .card-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* 中等屏幕上每行显示2个卡片 */
+    @media (min-width: 601px) and (max-width: 900px) {
+      .card-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 视频背景容器 -->
+  <div class="video-background">
+    <video autoplay muted loop playsinline>
+      <!-- 可以使用以下示例视频链接，或替换为您自己的视频 -->
+      <source src="原神.mp4" type="video/mp4">
+      <!-- 视频加载失败时的备选背景 -->
+      <div style="background-color: #f4f6f8; width: 100%; height: 100%;"></div>
+    </video>
+    <div class="video-overlay"></div>
+  </div>
+
+  <h1>考试剩余时间</h1>
+
+  <!-- 卡片容器 - 用于布局管理 -->
+  <div class="card-container">
+    <!-- 考试卡片 1 -->
+    <div class="flip-container">
+      <div class="flipper" data-exam="水资源利用与管理">
+        <div class="exam">
+          <h2>科目：水资源利用与管理</h2>
+          <h2>教室：天山堂A614</h2>
+          <div class="countdown" id="水资源利用与管理-countdown">计算中...</div>
+        </div>
+        <div class="exam-back">
+          <h2>复习重点：</h2>
+          <div class="review-content">
+            点什么点，滚去复习。
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 考试卡片 2 -->
+    <div class="flip-container">
+      <div class="flipper" data-exam="水资源利用与管理课程设计">
+        <div class="exam">
+          <h2>科目：水资源利用与管理课程设计</h2>
+          <h2>教室：天山堂A414</h2>
+          <div class="countdown" id="水资源利用与管理课程设计-countdown">计算中...</div>
+        </div>
+        <div class="exam-back">
+          <h2>复习重点：</h2>
+          <div class="review-content">
+            点什么点，滚去复习。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 考试卡片 3 -->
+    <div class="flip-container">
+      <div class="flipper" data-exam="水文水利计算">
+        <div class="exam">
+          <h2>科目：水文水利计算</h2>
+          <h2>教室：秦岭堂A109</h2>
+          <div class="countdown" id="水文水利计算-countdown">计算中...</div>
+        </div>
+        <div class="exam-back">
+          <h2>复习重点：</h2>
+          <div class="review-content">
+            点什么点，滚去复习。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 考试卡片 4 -->
+    <div class="flip-container">
+      <div class="flipper" data-exam="水文统计">
+        <div class="exam">
+          <h2>科目：水文统计</h2>
+          <h2>教室：天山堂A301</h2>
+          <div class="countdown" id="水文统计-countdown">计算中...</div>
+        </div>
+        <div class="exam-back">
+          <h2>复习重点：</h2>
+          <div class="review-content">
+            点什么点，滚去复习。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 考试卡片 5 -->
+    <div class="flip-container">
+      <div class="flipper" data-exam="水资源系统分析与规划">
+        <div class="exam">
+          <h2>科目：水资源系统分析与规划</h2>
+          <h2>教室：天山堂A501</h2>
+          <div class="countdown" id="水资源系统分析与规划-countdown">计算中...</div>
+        </div>
+        <div class="exam-back">
+          <h2>复习重点：</h2>
+          <div class="review-content">
+            点什么点，滚去复习。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 设置五门考试的时间
+    const exams = [
+      { name: '水资源利用与管理', date: new Date("2025-06-23T09:00:00") },
+      { name: '水资源利用与管理课程设计', date: new Date("2025-06-23T16:00:00") },
+      { name: '水文水利计算', date: new Date("2025-06-24T13:30:00") },
+      { name: '水文统计', date: new Date("2025-06-25T13:30:00") },
+      { name: '水资源系统分析与规划', date: new Date("2025-06-30T16:00:00") },
+    ];
+
+    // 将考试数据转换为对象映射，便于快速查找
+    const examMap = {};
+    exams.forEach(exam => {
+      examMap[exam.name] = exam;
+    });
+
+    // 更新单个卡片的倒计时
+    function updateSingleCountdown(flipper) {
+      const examName = flipper.dataset.exam;
+      const exam = examMap[examName];
+      if (!exam) return;
+      
+      const now = new Date();
+      const timeDiff = exam.date - now;
+      const element = document.getElementById(`${examName}-countdown`);
+      
+      if (timeDiff <= 0) {
+        element.textContent = "考试已开始或已结束！";
+        return;
+      }
+
+      const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((timeDiff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((timeDiff / (1000 * 60)) % 60);
+      const seconds = Math.floor((timeDiff / 1000) % 60);
+
+      element.textContent = `${days} 天 ${hours} 小时 ${minutes} 分 ${seconds} 秒`;
+    }
+
+    // 主更新函数，只更新正面显示的卡片
+    function updateCountdowns() {
+      document.querySelectorAll('.flipper').forEach(flipper => {
+        if (!flipper.classList.contains('flipped')) {
+          updateSingleCountdown(flipper);
+        }
+      });
+    }
+
+    // 初始化并设置倒计时更新
+    updateCountdowns();
+    const countdownInterval = setInterval(updateCountdowns, 1000);
+
+    // 卡片翻转逻辑优化
+    document.querySelectorAll('.flip-container').forEach(container => {
+      const flipper = container.querySelector('.flipper');
+      let autoFlipTimer = null;
+      
+      // 点击正面卡片翻转到背面
+      container.addEventListener('click', () => {
+        if (flipper.classList.contains('flipped') || autoFlipTimer) return;
+        
+        // 翻转到背面
+        flipper.classList.add('flipped');
+        
+        // 3秒后自动翻转回正面
+        autoFlipTimer = setTimeout(() => {
+          flipper.classList.remove('flipped');
+          autoFlipTimer = null;
+        }, 3000);
+      });
+    });
+
+    // 添加窗口卸载事件，清除定时器
+    window.addEventListener('beforeunload', () => {
+      clearInterval(countdownInterval);
+      // 清除所有自动翻转定时器
+      document.querySelectorAll('.flip-container').forEach(container => {
+        const flipper = container.querySelector('.flipper');
+        if (flipper.autoFlipTimer) {
+          clearTimeout(flipper.autoFlipTimer);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
